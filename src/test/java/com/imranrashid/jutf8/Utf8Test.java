@@ -1,8 +1,7 @@
 package com.imranrashid.jutf8;
 
 import static org.junit.Assert.*;
-
-import java.nio.charset.Charset;
+import static com.imranrashid.jutf8.Utf8.bs;
 
 import org.junit.Test;
 
@@ -53,25 +52,25 @@ public class Utf8Test {
 	public void testIsContinutation() {
 		assertEquals(false, Utf8.isContinutation((byte) 0));
 		assertEquals(false, Utf8.isContinutation((byte) 127));
-		assertEquals(true, Utf8.isContinutation((byte) 0b10000000));
-		assertEquals(true, Utf8.isContinutation((byte) 0b10101111));
-		assertEquals(false, Utf8.isContinutation((byte) 0b11000000));
+		assertEquals(true, Utf8.isContinutation((byte) bs("10000000")));
+		assertEquals(true, Utf8.isContinutation((byte) bs("10101111")));
+		assertEquals(false, Utf8.isContinutation((byte) bs("11000000")));
 	}
 	
 	@Test
 	public void testNBytes() {
 		assertEquals(1, Utf8.nBytes((byte) 0));
 		assertEquals(1, Utf8.nBytes((byte) 127));
-		assertEquals(2, Utf8.nBytes((byte) 0b11000000));
-		assertEquals(2, Utf8.nBytes((byte) 0b11011010));
-		assertEquals(3, Utf8.nBytes((byte) 0b11100000));
-		assertEquals(3, Utf8.nBytes((byte) 0b11101010));
-		assertEquals(4, Utf8.nBytes((byte) 0b11110000));
-		assertEquals(4, Utf8.nBytes((byte) 0b11110010));
-		assertEquals(5, Utf8.nBytes((byte) 0b11111000));
-		assertEquals(5, Utf8.nBytes((byte) 0b11111010));
-		assertEquals(6, Utf8.nBytes((byte) 0b11111100));
-		assertEquals(6, Utf8.nBytes((byte) 0b11111100));
+		assertEquals(2, Utf8.nBytes((byte) bs("11000000")));
+		assertEquals(2, Utf8.nBytes((byte) bs("11011010")));
+		assertEquals(3, Utf8.nBytes((byte) bs("11100000")));
+		assertEquals(3, Utf8.nBytes((byte) bs("11101010")));
+		assertEquals(4, Utf8.nBytes((byte) bs("11110000")));
+		assertEquals(4, Utf8.nBytes((byte) bs("11110010")));
+		assertEquals(5, Utf8.nBytes((byte) bs("11111000")));
+		assertEquals(5, Utf8.nBytes((byte) bs("11111010")));
+		assertEquals(6, Utf8.nBytes((byte) bs("11111100")));
+		assertEquals(6, Utf8.nBytes((byte) bs("11111100")));
 	}
-
+	
 }

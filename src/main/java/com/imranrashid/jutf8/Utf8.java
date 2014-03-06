@@ -2,7 +2,6 @@ package com.imranrashid.jutf8;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 
 public class Utf8 implements CharSequence {
 	final byte[] bytes;
@@ -94,15 +93,15 @@ public class Utf8 implements CharSequence {
 		return utf8Charset.decode(ByteBuffer.wrap(bytes, start, end - start)).toString().length();
 	}
 	
-	static byte CONTINUATION_MASK = (byte) 0b11000000;
-	static byte REV_CONTINUATION_MASK = (byte) ~CONTINUATION_MASK;
-	static byte CONTINUATION_BITS = (byte) 0b10000000;
+	final static byte CONTINUATION_MASK = (byte) bs("11000000");
+	final static byte REV_CONTINUATION_MASK = (byte) ~CONTINUATION_MASK;
+	final static byte CONTINUATION_BITS = (byte) bs("10000000");
 	
 	static boolean isContinutation(byte b) {
 		return (b & CONTINUATION_MASK) == CONTINUATION_BITS;
 	}
 	
-	static byte NBYTES_MASK = (byte) 0b10000000;
+	static byte NBYTES_MASK = (byte) bs("10000000");
 	static int nBytes(byte b) {
 		int n = 0;
 		int more = (b & NBYTES_MASK) >> 7;
@@ -125,6 +124,11 @@ public class Utf8 implements CharSequence {
 		int r = b << shiftLeft;
 		System.out.println("result: " + Integer.toBinaryString(r) + "\t" + r);
 		return r;
+	}
+	
+	static int bs(String s) {
+		//in java 7, binary literals are supported, but meanwhile ...
+		return Integer.parseInt(s, 2);
 	}
 
 }
