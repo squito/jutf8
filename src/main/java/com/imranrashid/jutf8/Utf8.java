@@ -28,7 +28,10 @@ public class Utf8 implements CharSequence {
     public Utf8(byte[] bytes) {
         this(bytes, 0, bytes.length);
     }
-
+    
+    public Utf8(String s) {
+        this(s.getBytes(Utf8.utf8Charset));
+    }
 
     @Override
     public int length() {
@@ -58,7 +61,7 @@ public class Utf8 implements CharSequence {
 
     private char decodeNext() {
         byte b = bytes[nextBytePos++];
-        int nbytes = nBytes(b);
+        int nbytes = tableNbytes(b);
         if (nbytes == 1) {
             char r = (char) b;
             ++nextChar;
@@ -105,24 +108,23 @@ public class Utf8 implements CharSequence {
     static int nBytes(byte b) {
         int n = 0;
         int more = (b & NBYTES_MASK) >> 7;
-            if (more == 0)
-                return 1;
-            b <<= 1;
-            while (more != 0){
-                more = (b & NBYTES_MASK) >> 7;
+        if (more == 0) {
+            return 1;
+        }
+        b <<= 1;
+        while (more != 0){
+            more = (b & NBYTES_MASK) >> 7;
             b <<= 1;
             n += 1;
-            }
-            return n;
+        }
+        return n;
     }
 
     static int extractLeadingBits(byte b, int nbytes) {
         int maskShift = (1 + nbytes);
         b = (byte) ((byte) (b << maskShift) >>> maskShift);
-        System.out.println("after mask: " + Integer.toBinaryString(b) + "\t" + b);
         int shiftLeft = (nbytes - 1) * 6;
         int r = b << shiftLeft;
-        System.out.println("result: " + Integer.toBinaryString(r) + "\t" + r);
         return r;
     }
 
@@ -130,5 +132,33 @@ public class Utf8 implements CharSequence {
         //in java 7, binary literals are supported, but meanwhile ...
         return Integer.parseInt(s, 2);
     }
+    
+    private static int[] buildLeadByteToNBytesTable() {
+        int[] leadByteToNBytes = new int[256];
+        for (int i = 0; i < 256; i++) {
+            byte b = (byte) i;
+            leadByteToNBytes[i] = nBytes(b);
+        }
+        return leadByteToNBytes;
+    }
+    private static final int[] leadByteToNBytes = buildLeadByteToNBytesTable();
+    static final int LOW_MASK = bs("11111111");
+    static final int tableNbytes(byte b) {
+        return leadByteToNBytes[b & LOW_MASK];
+    }
+    
+    private static int[] buildLeadByteToHighBitsTable() {
+        int[] leadByteToHighBits = new int[256];
+        for (int i = 0; i < 256; i++) {
+            byte b = (byte) i;
+            leadByteToHighBits[i] = extractLeadingBits(b, nBytes(b));
+        }
+        return leadByteToHighBits;
+    }
+    private static final int[] leadByteToHighBits = buildLeadByteToHighBitsTable();
+    static final int tableHighBits(byte b) {
+        return leadByteToHighBits[b & LOW_MASK];
+    }
+
 
 }

@@ -22,6 +22,7 @@ public class Utf8Test {
                 "ooga \u00b6 booga \u00b6\u00b6 \u00b6", // 2bytes in utf8, one byte in utf16
                 "\u00161",  //2 bytes in utf8 & 2 bytes in utf16
                 "foo\u2031bar" //3bytes
+                //TODO better 3 byte test.  current implementation should be failing, we're not taking 2nd byte correctly
                 //TODO 4-6 bytes, which are surrogate pairs, and a mess in java's api
         };
         for (String s: ss) {
@@ -59,18 +60,23 @@ public class Utf8Test {
 
     @Test
     public void testNBytes() {
-        assertEquals(1, Utf8.nBytes((byte) 0));
-        assertEquals(1, Utf8.nBytes((byte) 127));
-        assertEquals(2, Utf8.nBytes((byte) bs("11000000")));
-        assertEquals(2, Utf8.nBytes((byte) bs("11011010")));
-        assertEquals(3, Utf8.nBytes((byte) bs("11100000")));
-        assertEquals(3, Utf8.nBytes((byte) bs("11101010")));
-        assertEquals(4, Utf8.nBytes((byte) bs("11110000")));
-        assertEquals(4, Utf8.nBytes((byte) bs("11110010")));
-        assertEquals(5, Utf8.nBytes((byte) bs("11111000")));
-        assertEquals(5, Utf8.nBytes((byte) bs("11111010")));
-        assertEquals(6, Utf8.nBytes((byte) bs("11111100")));
-        assertEquals(6, Utf8.nBytes((byte) bs("11111100")));
+        checkNBytes(1, (byte) 0);
+        checkNBytes(1, (byte) 127);
+        checkNBytes(2, (byte) bs("11000000"));
+        checkNBytes(2, (byte) bs("11011010"));
+        checkNBytes(3, (byte) bs("11100000"));
+        checkNBytes(3, (byte) bs("11101010"));
+        checkNBytes(4, (byte) bs("11110000"));
+        checkNBytes(4, (byte) bs("11110010"));
+        checkNBytes(5, (byte) bs("11111000"));
+        checkNBytes(5, (byte) bs("11111010"));
+        checkNBytes(6, (byte) bs("11111100"));
+        checkNBytes(6, (byte) bs("11111100"));
+    }
+    
+    void checkNBytes(int exp, byte b) {
+        assertEquals(exp, Utf8.nBytes(b));
+        assertEquals(exp, Utf8.tableNbytes(b));
     }
 
 }
