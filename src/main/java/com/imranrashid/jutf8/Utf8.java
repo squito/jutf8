@@ -40,14 +40,105 @@ public class Utf8 implements CharSequence {
 
     @Override
     public char charAt(int index) {
+        char r = (char) bytes[index];
+        return r;
         //this allows fast movement forward through a string, char by char
         // but would be nice to allow backward movement, plus smarter about "nearby" jumps
+//        if (index == nextChar) {
+//            return decodeNext();
+//        } else {
+//            return replayDecodingTill(index);
+//        }
+    }
+    
+    public char a(int index) {
+        char r = (char) bytes[index];
+        return r;
+    }
+    
+    public char b(int index) {
+        char r = (char) bytes[index];
+        if (r <= 500)
+            return r;
+        else
+            return (char) -1;
+    }
+    
+    
+    
+    public char c(int index) {
+        byte b = bytes[index];
+        int n = tableNbytes(b);
+        if (n <= 500){
+            char r = (char) b;
+            return r;
+        }
+        else
+            return (char) -1;
+    }
+    
+    public char d(int index) {
+        byte b = bytes[index];
+        int n = nBytes(b);
+        if (n <= 500){
+            char r = (char) b;
+            return r;
+        }
+        else
+            return (char) -1;
+    }
+
+
+    public char e(int index) {
+        byte b = bytes[index];
+        int n = tableNbytes(b);
+        if (n == 1){
+            char r = (char) b;
+            return r;
+        }
+        else
+            return (char) -1;
+    }
+
+    public char f(int index) {
         if (index == nextChar) {
-            return decodeNext();
+            char r = (char) bytes[nextBytePos++];
+            ++nextChar;
+            return r;
+        } else if (index == 0){
+            nextBytePos = 1;
+            nextChar = 1;
+            return (char) bytes[0];
         } else {
-            return replayDecodingTill(index);
+            throw new RuntimeException("asked for index = " + index + " when nextChar = " + nextChar);
         }
     }
+    
+    
+    public char g(int index) {
+        if (index != 17) {
+            return (char) bytes[index];
+        } else {
+            return (char) bytes[17];
+        }
+    }
+    
+    public char h(int index) {
+        byte b = bytes[index];
+        int n = tableNbytes(b);
+        nextBytePos++;
+        ++nextChar;
+        if (n == 1){
+            char r = (char) b;
+            return r;
+        }
+        else
+            return (char) -1;
+    }
+
+
+
+    
 
     private char replayDecodingTill(int targetIndex) {
         nextChar = 0;
